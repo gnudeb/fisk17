@@ -1,16 +1,18 @@
 import re
 from typing import List
 
+# Sentinel value for Rule.post_action that indicates that token is to be ignored
+ignore = None
+
 
 class Rule:
-    def __init__(self, name, pattern, post_action=None):
+    def __init__(self, name, pattern, post_action=str):
         self.name = name
         self.regex = re.compile(pattern)
         self.post_action = post_action
 
 
 class Lexer:
-
     def __init__(self, *rules):
         self.rules: List[Rule] = [Rule(*args) for args in rules]
 

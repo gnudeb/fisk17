@@ -1,4 +1,4 @@
-from lexer import Lexer
+from lexer import Lexer, ignore
 
 
 def test_empty_input():
@@ -8,7 +8,7 @@ def test_empty_input():
 
 def test_simple_input():
     lexer = Lexer(
-        ("WHITESPACE", "[ \t\n]+"),
+        ("WHITESPACE", "[ \t\n]+", ignore),
         ("NUMBER", "[0-9]+", int),
     )
     assert lexer.produce_tokens("2 5 10") == [
