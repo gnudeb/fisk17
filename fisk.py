@@ -12,15 +12,14 @@ def _empty(_):
 
 directives = ["org", "db", "end"]
 operations = ["mov", "int", "jmp"]
+symbols = [",", r"\[", r"\]", "end"]
 
 
 fisk_lexer = Lexer(
-    ("WHITESPACE", "[ \t\n]"),
+    ("WHITESPACE", "[ \t]"),
     ("COMMENT", ";[^;\n]+"),
-    ("END", "end", _empty),
-    ("COMMA", ","),
-    ("LBRACKET", r"\[", _empty),
-    ("RBRACKET", r"\]", _empty),
+    ("NEWLINE", "\n", _empty),
+    ("SYMBOL", "|".join(symbols), str),
     ("DIRECTIVE", "|".join(directives), str),
     ("OPERATION", "|".join(operations), str),
     ("REGISTER", "r[lh][0-7]|r[0-9a-f]", str),
