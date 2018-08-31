@@ -1,0 +1,13 @@
+
+program: {line} 'end'
+
+line: [LABEL] [directive | command] NEWLINE
+
+directive: DIRECTIVE {directive_operand}
+directive_operand: NUMBER | STRING
+
+command: OPERATION [operand [',' operand]]
+operand: direct_operand | indirect_operand
+direct_operand: raw_operand
+indirect_operand: '[' raw_operand ']'
+raw_operand: REGISTER | NUMBER | IDENTIFIER
