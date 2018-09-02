@@ -1,4 +1,5 @@
-from parser import Terminal, NonTerminal, Token, RepeatingProduction, Node
+from parser import Terminal, NonTerminal, Token, RepeatingProduction, Node, \
+    OrProduction
 
 
 def test_terminal():
@@ -96,3 +97,34 @@ def test_repeating_terminal():
         Token("PLUS", None),
         Token("NUMBER", 3),
     ]
+
+
+def test_or_production_operator():
+    number = Terminal("NUMBER")
+    dot = Terminal("DOT")
+
+    assert number | dot == OrProduction(number, dot)
+    assert number | dot != OrProduction(dot, number)
+    assert dot | number != OrProduction(number, dot)
+
+
+def test_or_production():
+    production = Terminal("NUMBER") | Terminal("DOT")
+
+    tokens = [
+        Token("NUMBER", 5),
+        Token("DOT"),
+        Token("NUMBER", 4),
+    ]
+
+    tree, remaining_tokens = production.match(tokens)
+
+    assert tree == \
+        Node("NUMBER", (
+            Node(5),
+        ))
+
+    tree, remaining_tokens = production.match(remaining_tokens)
+
+    assert tree == Node("DOT")
+    assert remaining_tokens == [Token("NUMBER", 4)]

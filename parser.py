@@ -8,7 +8,7 @@ class Node(NamedTuple):
 
 class Token(NamedTuple):
     name: str
-    value: Union[str, int, None]
+    value: Union[str, int, None] = None
 
 
 Tokens = List[Token]
@@ -27,6 +27,9 @@ class Production:
     def __init__(self, name):
         self.name = name
 
+    def __or__(self, other):
+        return OrProduction(self, other)
+
     def match(self, tokens: List[Token]) -> Tuple[Node, Tokens]:
         """Match self's rule to `tokens` and return derived tree."""
         raise NotImplementedError
@@ -34,6 +37,39 @@ class Production:
     def repeat(self):
         """Return new """
         pass
+
+
+class OrProduction(Production):
+    """
+    An equivalent to `p1 | p2 | ... | pn` in EBNF.
+
+    It will try to match each production in strict order and return first that
+    matched. If none were matched, `UnmatchedProduction` will be raised.
+    """
+    def __init__(self, *productions):
+        super().__init__("")
+        self.productions = []
+        for production in productions:
+            if isinstance(production, OrProduction):
+                self.productions.extend(production.productions)
+            else:
+                self.productions.append(production)
+
+    def __eq__(self, other):
+        if not isinstance(other, OrProduction):
+            return False
+        return self.productions == other.productions
+
+    def __ne__(self, other):
+        return not self == other
+
+    def match(self, tokens: List[Token]):
+        for production in self.productions:
+            try:
+                return production.match(tokens)
+            except UnmatchedProduction:
+                pass
+        raise UnmatchedProduction
 
 
 class NonTerminal(Production):
