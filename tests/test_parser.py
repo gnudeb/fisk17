@@ -129,6 +129,35 @@ def test_repeating_terminal():
     ]
 
 
+def test_repeating_terminal_multiple_productions():
+    production = RepeatingProduction(
+        Terminal("NUMBER"),
+        Terminal("DOT")
+    )
+
+    tokens = [
+        Token("NUMBER", 5),
+        Token("DOT"),
+        Token("NUMBER", 3),
+        Token("DOT"),
+    ]
+
+    tree, remaining_tokens = production.match(tokens)
+
+    assert tree == \
+        Node(children=(
+            Node("NUMBER", (
+                Node(5),
+            )),
+            Node("DOT"),
+            Node("NUMBER", (
+                Node(3),
+            )),
+            Node("DOT"),
+        ))
+    assert not remaining_tokens
+
+
 def test_or_production_operator():
     number = Terminal("NUMBER")
     dot = Terminal("DOT")

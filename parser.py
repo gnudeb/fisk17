@@ -104,7 +104,10 @@ class Terminal(Production):
         self.value = value
 
     def match(self, tokens: List[Token]) -> Tuple[Node, Tokens]:
-        first_token: Token = tokens[0]
+        try:
+            first_token: Token = tokens[0]
+        except IndexError:
+            raise UnmatchedProduction
 
         if first_token.name != self.name:
             raise UnmatchedProduction
@@ -123,18 +126,21 @@ class RepeatingProduction(Production):
     It will match a given production zero or more times and return anonymous
     node.
     """
-    def __init__(self, production):
+    def __init__(self, *productions):
         super().__init__("")
-        self.production = production
+        self.productions = productions
 
     def match(self, tokens: List[Token]):
         subtrees = []
         remaining_tokens = tokens
         while True:
+            draft_subtrees = []
             try:
-                subtree, remaining_tokens = \
-                    self.production.match(remaining_tokens)
-                subtrees.append(subtree)
+                for production in self.productions:
+                    subtree, remaining_tokens = \
+                        production.match(remaining_tokens)
+                    draft_subtrees.append(subtree)
+                subtrees.extend(draft_subtrees)
             except UnmatchedProduction:
                 break
 
