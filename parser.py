@@ -145,3 +145,27 @@ class RepeatingProduction(Production):
                 break
 
         return Node(self.name, tuple(subtrees)), remaining_tokens
+
+
+class OptionalProduction(Production):
+    """
+    An equivalent to `[p1 p2 p3 ... pn]` in EBNF.
+
+    It will try to match a given production once and return an anonymous `Node`
+    on success and empty `Node` on failure.
+    """
+    def __init__(self, *productions):
+        super().__init__("")
+        self.productions = productions
+
+    def match(self, tokens: List[Token]):
+        subtrees = []
+        remaining_tokens = tokens
+        for production in self.productions:
+            try:
+                subtree, remaining_tokens = \
+                    production.match(remaining_tokens)
+            except UnmatchedProduction:
+                return Node(), tokens
+            subtrees.append(subtree), tokens
+        return Node(self.name, tuple(subtrees)), remaining_tokens

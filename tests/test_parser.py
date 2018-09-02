@@ -1,5 +1,5 @@
 from parser import Terminal, NonTerminal, Token, RepeatingProduction, Node, \
-    OrProduction
+    OrProduction, OptionalProduction
 
 
 def test_terminal():
@@ -187,3 +187,32 @@ def test_or_production():
 
     assert tree == Node("DOT")
     assert remaining_tokens == [Token("NUMBER", 4)]
+
+
+def test_optional_production():
+    production = OptionalProduction(
+        Terminal("NUMBER"),
+    )
+
+    tokens = [
+        Token("NUMBER", 5),
+        Token("DOT"),
+        Token("NUMBER", 4),
+    ]
+
+    tree, remaining_tokens = production.match(tokens)
+
+    assert tree == \
+        Node(children=(
+            Node("NUMBER", (
+                Node(5),
+            )),
+        ))
+
+    tree, remaining_tokens = production.match(remaining_tokens)
+
+    assert tree == Node()
+    assert remaining_tokens == [
+        Token("DOT"),
+        Token("NUMBER", 4)
+    ]
