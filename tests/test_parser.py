@@ -13,8 +13,8 @@ def test_terminal():
     tree, remaining_tokens = production.match(tokens)
 
     assert tree == \
-           Node("NUMBER", (
-               Node(5),
+        Node("NUMBER", (
+            Node(5),
         ))
     assert remaining_tokens == [Token("END", None)]
 
@@ -62,9 +62,9 @@ def test_non_terminal():
     tree, remaining_tokens = production.match(tokens)
 
     assert tree == \
-           Node("number", (
-               Node("NUMBER", (
-                   Node(5),
+        Node("number", (
+            Node("NUMBER", (
+                Node(5),
             )),
         ))
     assert remaining_tokens == [Token("END", None)]
@@ -112,15 +112,15 @@ def test_repeating_terminal():
     tree, remaining_tokens = production.match(tokens)
 
     assert tree == \
-           Node(children=(
-               Node("NUMBER", (
+        Node(children=(
+            Node("NUMBER", (
                    Node(5),
             )),
-               Node("NUMBER", (
-                   Node(2),
+            Node("NUMBER", (
+                Node(2),
             )),
-               Node("NUMBER", (
-                   Node(4),
+            Node("NUMBER", (
+                Node(4),
             )),
         ))
     assert remaining_tokens == [
