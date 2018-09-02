@@ -1,9 +1,9 @@
-from typing import NamedTuple, Union, List, Tuple
+from typing import NamedTuple, Union, List, Tuple, Any
 
 
-class Tree(list):
-    def __init__(self, *values):
-        super().__init__(values)
+class Node(NamedTuple):
+    value: Any = ""
+    children: Tuple['Node', ...] = tuple()
 
 
 class Token(NamedTuple):
@@ -27,7 +27,7 @@ class Production:
     def __init__(self, name):
         self.name = name
 
-    def match(self, tokens: List[Token]) -> Tuple[Tree, Tokens]:
+    def match(self, tokens: List[Token]) -> Tuple[Node, Tokens]:
         """Match self's rule to `tokens` and return derived tree."""
         raise NotImplementedError
 
@@ -47,13 +47,13 @@ class NonTerminal(Production):
         super().__init__(name)
         self.productions = productions
 
-    def match(self, tokens: List[Token]) -> Tuple[Tree, Tokens]:
-        tree = Tree()
+    def match(self, tokens: List[Token]) -> Tuple[Node, Tokens]:
+        subtrees: List[Node] = []
         remaining_tokens = tokens
         for production in self.productions:
             subtree, remaining_tokens = production.match(remaining_tokens)
-            tree.append(subtree)
-        return Tree(self.name, tree), remaining_tokens
+            subtrees.append(subtree)
+        return Node(self.name, tuple(subtrees)), remaining_tokens
 
 
 class Terminal(Production):
@@ -65,10 +65,14 @@ class Terminal(Production):
 
     This class is equivalent to a terminal production in EBNF.
     """
-    def match(self, tokens: List[Token]) -> Tuple[Tree, Tokens]:
+    def match(self, tokens: List[Token]) -> Tuple[Node, Tokens]:
         first_token: Token = tokens[0]
         if first_token.name == self.name:
-            return Tree(self.name, first_token.value), tokens[1:]
+            if first_token.value is not None:
+                children = (Node(first_token.value),)
+            else:
+                children = ()
+            return Node(self.name, children), tokens[1:]
         raise UnmatchedProduction
 
 
@@ -84,14 +88,14 @@ class RepeatingProduction(Production):
         self.production = production
 
     def match(self, tokens: List[Token]):
-        tree = Tree()
+        subtrees = []
         remaining_tokens = tokens
         while True:
             try:
                 subtree, remaining_tokens = \
                     self.production.match(remaining_tokens)
-                tree.append(subtree)
+                subtrees.append(subtree)
             except UnmatchedProduction:
                 break
 
-        return Tree(self.name, tree), remaining_tokens
+        return Node(self.name, tuple(subtrees)), remaining_tokens

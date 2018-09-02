@@ -1,4 +1,4 @@
-from parser import Terminal, NonTerminal, Token, RepeatingProduction
+from parser import Terminal, NonTerminal, Token, RepeatingProduction, Node
 
 
 def test_terminal():
@@ -11,7 +11,10 @@ def test_terminal():
 
     tree, remaining_tokens = production.match(tokens)
 
-    assert tree == ["NUMBER", 5]
+    assert tree == \
+           Node("NUMBER", (
+               Node(5),
+        ))
     assert remaining_tokens == [Token("END", None)]
 
 
@@ -27,11 +30,12 @@ def test_non_terminal():
 
     tree, remaining_tokens = production.match(tokens)
 
-    assert tree == [
-        "number", [
-            ["NUMBER", 5]
-        ]
-    ]
+    assert tree == \
+           Node("number", (
+               Node("NUMBER", (
+                   Node(5),
+            )),
+        ))
     assert remaining_tokens == [Token("END", None)]
 
 
@@ -50,13 +54,16 @@ def test_compound_non_terminal():
 
     tree, remaining_tokens = production.match(tokens)
 
-    assert tree == [
-        "expr", [
-            ["NUMBER", 5],
-            ["PLUS", None],
-            ["NUMBER", 3]
-        ]
-    ]
+    assert tree == \
+           Node("expr", (
+               Node("NUMBER", (
+                   Node(5),
+            )),
+               Node("PLUS"),
+               Node("NUMBER", (
+                   Node(3),
+            )),
+        ))
     assert remaining_tokens == []
 
 
@@ -73,13 +80,18 @@ def test_repeating_terminal():
 
     tree, remaining_tokens = production.match(tokens)
 
-    assert tree == [
-        "", [
-            ["NUMBER", 5],
-            ["NUMBER", 2],
-            ["NUMBER", 4],
-        ]
-    ]
+    assert tree == \
+           Node(children=(
+               Node("NUMBER", (
+                   Node(5),
+            )),
+               Node("NUMBER", (
+                   Node(2),
+            )),
+               Node("NUMBER", (
+                   Node(4),
+            )),
+        ))
     assert remaining_tokens == [
         Token("PLUS", None),
         Token("NUMBER", 3),
