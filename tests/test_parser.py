@@ -55,13 +55,13 @@ def test_compound_non_terminal():
     tree, remaining_tokens = production.match(tokens)
 
     assert tree == \
-           Node("expr", (
-               Node("NUMBER", (
-                   Node(5),
+        Node("expr", (
+            Node("NUMBER", (
+                Node(5),
             )),
-               Node("PLUS"),
-               Node("NUMBER", (
-                   Node(3),
+            Node("PLUS"),
+            Node("NUMBER", (
+                Node(3),
             )),
         ))
     assert remaining_tokens == []
