@@ -62,6 +62,8 @@ class Terminal(Production):
 
     It will match any token that has the same name as `self.name`. If a token
     cannot be matched, `Terminal` will raise `UnmatchedProduction`.
+    If matched token has no value, the returned `Node` will have no children,
+    instead of having a child with value of `None`.
 
     This class is equivalent to a terminal production in EBNF.
     """
