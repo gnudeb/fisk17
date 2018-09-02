@@ -19,6 +19,36 @@ def test_terminal():
     assert remaining_tokens == [Token("END", None)]
 
 
+def test_terminal_with_value():
+    production = NonTerminal("indirect_operand", [
+        Terminal("SYMBOL", "["),
+        Terminal("NUMBER"),
+        Terminal("SYMBOL", "]"),
+    ])
+
+    tokens = [
+        Token("SYMBOL", "["),
+        Token("NUMBER", 5),
+        Token("SYMBOL", "]")
+    ]
+
+    tree, remaining_tokens = production.match(tokens)
+
+    assert tree == \
+        Node("indirect_operand", (
+            Node("SYMBOL", (
+                Node("["),
+            )),
+            Node("NUMBER", (
+                Node(5),
+            )),
+            Node("SYMBOL", (
+                Node("]"),
+            )),
+        ))
+    assert not remaining_tokens
+
+
 def test_non_terminal():
     production = NonTerminal("number", [
         Terminal("NUMBER")

@@ -99,15 +99,21 @@ class Terminal(Production):
 
     This class is equivalent to a terminal production in EBNF.
     """
+    def __init__(self, name, value=None):
+        super().__init__(name)
+        self.value = value
+
     def match(self, tokens: List[Token]) -> Tuple[Node, Tokens]:
         first_token: Token = tokens[0]
-        if first_token.name == self.name:
-            if first_token.value is not None:
-                children = (Node(first_token.value),)
-            else:
-                children = ()
-            return Node(self.name, children), tokens[1:]
-        raise UnmatchedProduction
+
+        if first_token.name != self.name:
+            raise UnmatchedProduction
+        if self.value is not None and first_token.value != self.value:
+            raise UnmatchedProduction
+        if first_token.value is None:
+            return Node(self.name, tuple()), tokens[1:]
+        children = (Node(first_token.value),)
+        return Node(self.name, children), tokens[1:]
 
 
 class RepeatingProduction(Production):
