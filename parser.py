@@ -34,10 +34,6 @@ class Production:
         """Match self's rule to `tokens` and return derived tree."""
         raise NotImplementedError
 
-    def repeat(self):
-        """Return new """
-        pass
-
 
 class OrProduction(Production):
     """
