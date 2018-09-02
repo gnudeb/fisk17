@@ -14,6 +14,10 @@ class Token(NamedTuple):
 Tokens = List[Token]
 
 
+class UnmatchedProduction(Exception):
+    pass
+
+
 class Production:
     def __init__(self, name):
         self.name = name
@@ -46,3 +50,28 @@ class Terminal(Production):
         first_token: Token = tokens[0]
         if first_token.name == self.name:
             return Tree(self.name, first_token.value), tokens[1:]
+        raise UnmatchedProduction
+
+
+class RepeatingProduction(Production):
+    """
+    Match a given production zero or more times and return anonymous node.
+
+    This class is equivalent to `{production}` in EBNF.
+    """
+    def __init__(self, production):
+        super().__init__("")
+        self.production = production
+
+    def match(self, tokens: List[Token]):
+        tree = Tree()
+        remaining_tokens = tokens
+        while True:
+            try:
+                subtree, remaining_tokens = \
+                    self.production.match(remaining_tokens)
+                tree.append(subtree)
+            except UnmatchedProduction:
+                break
+
+        return Tree(self.name, tree), remaining_tokens

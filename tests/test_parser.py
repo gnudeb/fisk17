@@ -1,4 +1,4 @@
-from parser import Terminal, NonTerminal, Token
+from parser import Terminal, NonTerminal, Token, RepeatingProduction
 
 
 def test_terminal():
@@ -61,7 +61,7 @@ def test_compound_non_terminal():
 
 
 def test_repeating_terminal():
-    production = Terminal("NUMBER").repeat()
+    production = RepeatingProduction(Terminal("NUMBER"))
 
     tokens = [
         Token("NUMBER", 5),
@@ -74,7 +74,7 @@ def test_repeating_terminal():
     tree, remaining_tokens = production.match(tokens)
 
     assert tree == [
-        "expr", [
+        "", [
             ["NUMBER", 5],
             ["NUMBER", 2],
             ["NUMBER", 4],
