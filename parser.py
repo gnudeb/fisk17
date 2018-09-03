@@ -5,6 +5,33 @@ class Node(NamedTuple):
     value: Any = ""
     children: Tuple['Node', ...] = tuple()
 
+    def __repr__(self):
+        return f"{self.value}:{self.children}"
+
+    def as_tree(self, indent=2, level=0):
+        head = str(self.value)
+        tail = "\n".join(
+            child.as_tree(indent, level+1) for child in self.children)
+        indent_block = " "*indent*level
+        if tail:
+            return f"{indent_block}{head}\n{tail}"
+        else:
+            return f"{indent_block}{head}"
+
+    @property
+    def is_anonymous(self):
+        return self.value == ""
+
+    def normalized(self):
+        """Replace each anonymous `Node` in the tree with it's children."""
+        children = []
+        for child in self.children:
+            if child.is_anonymous:
+                children.extend(child.normalized().children)
+            else:
+                children.append(child.normalized())
+        return Node(self.value, tuple(children))
+
 
 class Token(NamedTuple):
     name: str
