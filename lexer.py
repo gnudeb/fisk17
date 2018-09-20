@@ -1,23 +1,36 @@
 import re
-from typing import List
+from typing import Tuple
 
-# Sentinel value for Rule.post_action that indicates that token is to be ignored
-ignore = None
+
+def do_nothing():
+    pass
 
 
 class Rule:
-    def __init__(self, name, pattern, post_action=str):
+    def __init__(
+            self, name, pattern, mutator=str, post_action=do_nothing,
+            ignore=False):
+
         self.name = name
         self.regex = re.compile(pattern)
+        self.mutator = mutator
         self.post_action = post_action
+        self.ignore = ignore
+
+    def __repr__(self):
+        return f"Rule({self.name})"
+
+
+class LexerError(Exception):
+    pass
 
 
 class Lexer:
-    def __init__(self, *rules):
-        self.rules: List[Rule] = [Rule(*args) for args in rules]
+    def __init__(self, rules: Tuple[Rule, ...]=None):
+        self.rules: Tuple[Rule, ...] = rules or ()
+        self.current_line = 1
 
-    def produce_tokens(self, code: str):
-        tokens = []
+    def tokens(self, code: str):
         shift = 0
 
         while shift < len(code):
@@ -27,10 +40,13 @@ class Lexer:
                 if match:
                     _, shift = match.span()
                     value = match.group()
-                    if rule.post_action:
-                        tokens.append((rule.name, rule.post_action(value)))
+                    if not rule.ignore:
+                        yield rule.name, rule.mutator(value)
+                    rule.post_action()
                     break
             if not match:
-                raise Exception
-
-        return tokens
+                error_line = code.split("\n")[self.current_line-1]
+                raise LexerError(
+                    f"Unexpected input on line {self.current_line}:\n"
+                    f"{error_line}"
+                )

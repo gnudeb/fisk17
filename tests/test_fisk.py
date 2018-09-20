@@ -1,19 +1,17 @@
-from fisk import fisk_lexer
+from fisk import FiskLexer
 
 
 def test_lexer_fisk_sample():
     with open("sample.fisk", 'r') as f:
         sample = f.read()
 
-    assert fisk_lexer.produce_tokens(sample) == [
-        ("NEWLINE", None),
+    tokens = list(FiskLexer().tokens(sample))
+
+    assert tokens == [
         ("DIRECTIVE", "org"),
         ("NUMBER", 0x100),
-        ("NEWLINE", None),
-        ("NEWLINE", None),
         ("OPERATION", "jmp"),
         ("IDENTIFIER", "main"),
-        ("NEWLINE", None),
         ("LABEL", "array"),
         ("DIRECTIVE", "db"),
         ("NUMBER", 1),
@@ -27,45 +25,31 @@ def test_lexer_fisk_sample():
         ("NUMBER", 5),
         ("SYMBOL", ","),
         ("NUMBER", 8),
-        ("NEWLINE", None),
         ("LABEL", "msg"),
         ("DIRECTIVE", "db"),
         ("STRING", "Hello, Fisk!"),
         ("SYMBOL", ","),
         ("NUMBER", 0),
-        ("NEWLINE", None),
-        ("NEWLINE", None),
         ("LABEL", "main"),
-        ("NEWLINE", None),
         ("OPERATION", "mov"),
         ("REGISTER", "r0"),
         ("SYMBOL", ","),
         ("NUMBER", 0x03),
-        ("NEWLINE", None),
         ("OPERATION", "mov"),
         ("REGISTER", "r1"),
         ("SYMBOL", ","),
         ("IDENTIFIER", "msg"),
-        ("NEWLINE", None),
         ("OPERATION", "int"),
         ("NUMBER", 0x10),
-        ("NEWLINE", None),
-        ("NEWLINE", None),
         ("OPERATION", "mov"),
         ("REGISTER", "r0"),
         ("SYMBOL", ","),
         ("SYMBOL", "["),
         ("REGISTER", "r1"),
         ("SYMBOL", "]"),
-        ("NEWLINE", None),
         ("OPERATION", "int"),
         ("NUMBER", 0x11),
-        ("NEWLINE", None),
-        ("NEWLINE", None),
         ("OPERATION", "jmp"),
         ("IDENTIFIER", "$"),
-        ("NEWLINE", None),
-        ("NEWLINE", None),
         ("SYMBOL", "end"),
-        ("NEWLINE", None),
     ]
