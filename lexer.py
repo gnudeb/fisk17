@@ -39,7 +39,10 @@ class Lexer:
                 match = rule.regex.match(code, pos=shift)
                 if match:
                     _, shift = match.span()
-                    value = match.group()
+                    try:
+                        value = match.groups()[0]
+                    except IndexError:
+                        value = match.group()
                     if not rule.ignore:
                         yield rule.name, rule.mutator(value)
                     rule.post_action()

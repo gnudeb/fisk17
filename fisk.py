@@ -11,18 +11,7 @@ def _hex(value: str):
 
 
 def _bin(value: str):
-    return int(value, 2)
-
-
-def label(value: str):
-    """
-    Remove last character in given string.
-
-    Used as a mutator for labels that have colon as their last character:
-    >>> label("main:")
-    "main"
-    """
-    return value[:-1]
+    return int(value, 2)g
 
 
 class FiskLexer(Lexer):
@@ -38,7 +27,7 @@ class FiskLexer(Lexer):
             Rule("NUMBER", "0x[0-9a-f]+", _hex),
             Rule("NUMBER", "0b[0-1]+", _bin),
             Rule("NUMBER", "[0-9]+", int),
-            Rule("LABEL", "[a-zA-Z_][a-zA-Z0-9_]+:", label),
+            Rule("LABEL", "([a-zA-Z_][a-zA-Z0-9_]+):"),
             Rule("IDENTIFIER", "[a-zA-Z_][a-zA-Z0-9_]+"),
             Rule("IDENTIFIER", r"\$"),
             Rule("STRING", "'[^'\n]*'", lambda s: s[1:-1]),
