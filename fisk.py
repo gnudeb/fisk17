@@ -11,7 +11,7 @@ def _hex(value: str):
 
 
 def _bin(value: str):
-    return int(value, 2)g
+    return int(value, 2)
 
 
 class FiskLexer(Lexer):
